@@ -18,3 +18,9 @@ def test_path(compiler):
 def test_includes(compiler):
     compiler.addincludes('C:/src/VulkanSDK/Include', 'C:/src/volk')
     assert len(compiler.includes) == 2
+    compiler.discardincludes('C:/src/volk')
+    assert len(compiler.includes) == 1
+
+def test_stages(compiler):
+    compiler.setstages(True, False, True)
+    assert compiler.outasm == True and compiler.outobj == False and compiler.outfinal == True

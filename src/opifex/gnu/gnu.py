@@ -6,8 +6,8 @@ class gnu:
     """
     def __init__(self, path, name, **kwargs):
         """
-        Takes the file path to a gnu compiler and a toolchain name for file management.
-        Raises AssertionError if path doesn't exist.
+        Takes the file path to a gnu compiler and a toolchain name for file management and suffix.
+        Raises AssertionError if path doesn't exist or if name contains spaces.
         """
         self.path = pathlib.Path(path)
         assert self.path.is_file(), f'gnu(). path must be a valid path to a file.\nUse a wrapper to search PATH and other dirs.\n{self.path.as_posix()} was not found.'
@@ -16,6 +16,16 @@ class gnu:
     
         self.includes = set()
         [self.addincludes(elem) for elem in kwargs.get('includes', [])]
+    
+    def setstages(self, asm, obj, final):
+        """
+        Set which stages to intermit at and output during compilation. 
+        kwargs: asm, obj, and final
+        """
+        self.outasm = asm
+        self.outobj = obj
+        self.outfinal = final
+        return self
     
     def addincludes(self, *includes):
         """
@@ -26,4 +36,12 @@ class gnu:
             dir = pathlib.Path(include)
             assert dir.is_dir(), f'gnu.addincludes(). Each include in includes must be a valid directory.\n{dir.as_posix()} was not found.'
             self.includes.add(dir)
+        return self
+
+    def discardincludes(self, *includes):
+        """
+        Removes each path-like entry in includes.
+        """
+        for include in includes:
+            self.includes.remove(pathlib.Path(include))
         return self
