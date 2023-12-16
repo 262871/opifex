@@ -7,9 +7,10 @@ Accelerates configuration and usage of compilers from python.
 ```
 Name                     Stmts   Miss  Cover
 --------------------------------------------
-src/opifex/__init__.py       1      0   100%
-src/opifex/gnu/gnu.py        5      0   100%
-test/test_opifex.py         18      0   100%
+src\opifex\__init__.py       1      0   100%
+src\opifex\gnu\gnu.py       15      0   100%
+test\test_gnu.py            14      0   100%
+test\test_opifex.py         10      0   100%
 --------------------------------------------
-TOTAL                       24      0   100%
+TOTAL                       40      0   100%
 ```
