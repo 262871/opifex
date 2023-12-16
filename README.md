@@ -4,6 +4,7 @@
 Accelerates configuration and usage of compilers from python.
 
 ## Tests
+```
 Name                     Stmts   Miss  Cover
 --------------------------------------------
 src/opifex/__init__.py       1      0   100%
@@ -11,3 +12,4 @@ src/opifex/gnu/gnu.py        5      0   100%
 test/test_opifex.py         18      0   100%
 --------------------------------------------
 TOTAL                       24      0   100%
+```
