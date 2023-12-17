@@ -22,5 +22,11 @@ def test_includes(compiler):
     assert len(compiler.includes) == 1
 
 def test_stages(compiler):
-    compiler.setstages(True, False, True)
-    assert compiler.outasm == True and compiler.outobj == False and compiler.outfinal == True
+    assert compiler.outasm == False and compiler.outobj == False and compiler.outfinal == True
+    compiler.setstages(True, True, False)
+    assert compiler.outasm == True and compiler.outobj == True and compiler.outfinal == False
+
+def test_static(compiler):
+    assert compiler.static == True
+    compiler.setstatic(False)
+    assert compiler.static == False
