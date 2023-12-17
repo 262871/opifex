@@ -64,3 +64,8 @@ def test_asm_cmd(compiler: gnu, files):
     asm_files, cmd = compiler.asm_cmd(files)
     assert len(cmd) == len('cd "c:/msys64/mingw64/bin" && g++.exe -S "mock/main.cpp" "mock/app.cxx" -I -o "C:/Users/User/Desktop/python/opifex/build/mingw64/asm/main.s" "C:/Users/User/Desktop/python/opifex/build/mingw64/asm/app.s" -Wextra -Wall -Werror -pedantic')
     assert set(asm_files) == {pathlib.Path('build/mingw64/asm/main.s').resolve(), pathlib.Path('build/mingw64/asm/app.s').resolve()}
+
+def test_obj_cmd(compiler: gnu, files):
+    obj_files, cmd = compiler.obj_cmd(files)
+    assert len(cmd) == len('cd "c:/msys64/mingw64/bin" && g++.exe -c "mock/main.cpp" "mock/app.cxx" -I -o "C:/Users/User/Desktop/python/opifex/build/mingw64/obj/main.obj" "C:/Users/User/Desktop/python/opifex/build/mingw64/obj/app.obj" -Wextra -Wall -Werror -pedantic')
+    assert set(obj_files) == {pathlib.Path('build/mingw64/obj/main.obj').resolve(), pathlib.Path('build/mingw64/obj/app.obj').resolve()}

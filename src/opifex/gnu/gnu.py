@@ -55,6 +55,20 @@ class gnu:
         
         return (asmfiles, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' -S ' + inputs + incldirs + outputs + options)
     
+    def obj_cmd(self, files):
+        dir = self.builddir / self.name / 'obj'
+        os.makedirs(dir, exist_ok=True)
+        
+        inputs = ' '.join([gnu.safe(file) for file in files])
+        
+        objfiles = [ (dir / file.stem).with_suffix('.obj') for file in files ]
+        outputs = ' -o ' + ' '.join([gnu.safe(file) for file in objfiles])
+        
+        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes])
+        options = ' ' + ' '.join(self.options)
+        
+        return (objfiles, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' -c ' + inputs + incldirs + outputs + options)
+    
     def compile(self, files):
         """
         Run compiler with internal configuration and files as input and return the path(s) to the output files in builddir.
