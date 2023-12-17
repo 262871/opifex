@@ -33,7 +33,14 @@ class gnu:
         
         self.target = kwargs.get('target', pathlib.Path('.').absolute().stem + '_' + self.name)
         self.builddir = kwargs.get('builddir', pathlib.Path('build/').absolute())
-        
+    
+    @staticmethod
+    def safe(path):
+        """
+        Wrap the path in double quotes in case of spaces in path and use forward slashes. 
+        """
+        return f'"{path.as_posix()}"'
+    
     def compile(self, files):
         """
         Run compiler with internal configuration and files as input and return the path(s) to the output files in builddir.

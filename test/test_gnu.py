@@ -53,3 +53,6 @@ def test_compile(compiler: gnu):
     files = [pathlib.Path('mock/main.cpp')]
     executable = compiler.compile(files)
     assert executable
+
+def test_safe_path_to_string():
+    assert gnu.safe(pathlib.Path('\\test path\\with backslash and spaces')) == '"/test path/with backslash and spaces"'
