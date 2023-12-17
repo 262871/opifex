@@ -26,6 +26,9 @@ class gnu:
         [self.addlibpaths(elem) for elem in kwargs.get('libpaths', [])]
         self.libs = set()
         [self.addlibs(elem) for elem in kwargs.get('libraries', [])]
+        
+        self.options = set()
+        [self.addopts(elem) for elem in kwargs.get('options', {'-Wall', '-Wextra', '-pedantic', '-Werror'})] 
     
     def setstages(self, asm, obj, final):
         """
@@ -100,3 +103,20 @@ class gnu:
             self.libs.remove(libname)
         return self
     
+    def addopts(self, *options):
+        """
+        Adds each string-like entry in options.
+        Raises AssertionError if entry doesn't start with - or contains spaces.
+        """
+        for option in options:
+            assert option.startswith('-') and ' ' not in option, f'gnu.addopts(). options must start with a - and not contain spaces. option was [{option}].'
+            self.options.add(option)
+        return self
+    
+    def discardopts(self, *options):
+        """
+        Removes each string-like entry in options.
+        """
+        for option in options:
+            self.options.remove(option)
+        return self

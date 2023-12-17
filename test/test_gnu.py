@@ -42,3 +42,9 @@ def test_libs(compiler: gnu):
     assert len(compiler.libs) == 1
     compiler.discardlibs('boost_1_82_0')
     assert len(compiler.libs) == 0
+
+def test_opts(compiler: gnu):
+    compiler.addopts('-O3')
+    assert len(compiler.options) == 5
+    compiler.discardopts('-pedantic')
+    assert len(compiler.options) == 4
