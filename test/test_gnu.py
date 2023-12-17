@@ -49,10 +49,18 @@ def test_opts(compiler: gnu):
     compiler.discardopts('-pedantic')
     assert len(compiler.options) == 4
 
-def test_compile(compiler: gnu):
-    files = [pathlib.Path('mock/main.cpp')]
+@pytest.fixture
+def files():
+    return [pathlib.Path('mock/main.cpp'), pathlib.Path('mock/app.cxx')]
+
+def test_compile(compiler: gnu, files):
     executable = compiler.compile(files)
     assert executable
 
 def test_safe_path_to_string():
     assert gnu.safe(pathlib.Path('\\test path\\with backslash and spaces')) == '"/test path/with backslash and spaces"'
+    
+def test_asm_cmd(compiler: gnu, files):
+    asm_files, cmd = compiler.asm_cmd(files)
+    assert len(cmd) == len('cd "c:/msys64/mingw64/bin" && g++.exe -S "mock/main.cpp" "mock/app.cxx" -I -o "C:/Users/User/Desktop/python/opifex/build/mingw64/asm/main.s" "C:/Users/User/Desktop/python/opifex/build/mingw64/asm/app.s" -Wextra -Wall -Werror -pedantic')
+    assert set(asm_files) == {pathlib.Path('build/mingw64/asm/main.s').resolve(), pathlib.Path('build/mingw64/asm/app.s').resolve()}

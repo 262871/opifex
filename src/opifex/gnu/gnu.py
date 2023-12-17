@@ -41,6 +41,20 @@ class gnu:
         """
         return f'"{path.as_posix()}"'
     
+    def asm_cmd(self, cppfiles):
+        dir = self.builddir / self.name / 'asm'
+        os.makedirs(dir, exist_ok=True)
+        
+        inputs = ' '.join([gnu.safe(file) for file in cppfiles])
+        
+        asmfiles = [ (dir / file.stem).with_suffix('.s') for file in cppfiles ]
+        outputs = ' -o ' + ' '.join([gnu.safe(file) for file in asmfiles])
+        
+        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes])
+        options = ' ' + ' '.join(self.options)
+        
+        return (asmfiles, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' -S ' + inputs + incldirs + outputs + options)
+    
     def compile(self, files):
         """
         Run compiler with internal configuration and files as input and return the path(s) to the output files in builddir.
