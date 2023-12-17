@@ -24,6 +24,8 @@ class gnu:
         [self.addincludes(elem) for elem in kwargs.get('includes', [])]
         self.libpaths = set()
         [self.addlibpaths(elem) for elem in kwargs.get('libpaths', [])]
+        self.libs = set()
+        [self.addlibs(elem) for elem in kwargs.get('libraries', [])]
     
     def setstages(self, asm, obj, final):
         """
@@ -79,3 +81,22 @@ class gnu:
         for libpath in libpaths:
             self.libpaths.remove(pathlib.Path(libpath))
         return self
+    
+    def addlibs(self, *libnames):
+        """
+        Adds each string-like entry in libnames.
+        Raises AssertionError if entry doesn't start with - or contains spaces.
+        """
+        for libname in libnames:
+            assert ' ' not in libname, f'gnu.addlibs(). libnames must not contain spaces. libname was [{libname}].'
+            self.libs.add(libname)
+        return self
+    
+    def discardlibs(self, *libnames):
+        """
+        Removes each string-like entry in libnames.
+        """
+        for libname in libnames:
+            self.libs.remove(libname)
+        return self
+    
