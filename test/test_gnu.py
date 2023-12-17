@@ -54,8 +54,10 @@ def files():
     return [pathlib.Path('mock/main.cpp'), pathlib.Path('mock/app.cxx')]
 
 def test_compile(compiler: gnu, files):
-    executable = compiler.compile(files)
+    compiler.setstages(True, True, True)
+    executable, logs = compiler.compile(files)
     assert executable
+    assert len(logs) == 3
 
 def test_safe_path_to_string():
     assert gnu.safe(pathlib.Path('\\test path\\with backslash and spaces')) == '"/test path/with backslash and spaces"'
@@ -74,3 +76,9 @@ def test_final_cmd(compiler: gnu, files):
     file, cmd = compiler.final_cmd(files)
     assert len(cmd) == len('cd "c:/msys64/mingw64/bin" && g++.exe "mock/main.cpp" "mock/app.cxx" -o "C:/Users/User/Desktop/python/opifex/build/opifex_mingw64" -Wextra -Wall -Werror -pedantic -static')
     assert file.resolve() == pathlib.Path('build/opifex_mingw64').resolve()
+
+def test_compile_kernel(compiler: gnu):
+    code, stdout, stderr = compiler.compile_kernel('echo "Hello, World!"')
+    assert code == 0
+    assert stdout == 'Microsoft Windows [Version 10.0.19045.3803]\n(c) Microsoft Corporation. All rights reserved.\n\nC:\\Users\\User\\Desktop\\python\\opifex>'
+    assert stderr == ''

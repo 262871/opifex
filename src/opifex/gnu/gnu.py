@@ -1,5 +1,7 @@
 import os
 import pathlib
+import shlex
+import subprocess
 
 class gnu:
     """
@@ -33,6 +35,10 @@ class gnu:
         
         self.target = kwargs.get('target', pathlib.Path('.').absolute().stem + '_' + self.name)
         self.builddir = kwargs.get('builddir', pathlib.Path('build/').absolute())
+    
+    def compile_kernel(self, cmd):
+        task = subprocess.run(['cmd'] + shlex.split(cmd), capture_output=True, text=True)
+        return (task.returncode, task.stdout, task.stderr)
     
     @staticmethod
     def safe(path):
@@ -88,7 +94,23 @@ class gnu:
         Run compiler with internal configuration and files as input and return the path(s) to the output files in builddir.
         """
         os.makedirs(self.builddir, exist_ok=True)
-        return files
+        logs = []
+        failed = False
+        if self.outasm:
+            files, cmd = self.asm_cmd(files)
+            ret, stdout, stderr = self.compile_kernel(cmd)
+            failed = False if ret == 0 else True
+            logs.append([ret, stdout, stderr])
+        if self.outobj and not failed:
+            files, cmd = self.obj_cmd(files)
+            ret, stdout, stderr = self.compile_kernel(cmd)
+            failed = False if ret == 0 else True
+            logs.append([ret, stdout, stderr])
+        if self.outfinal and not failed:
+            files, cmd = self.final_cmd(files)
+            ret, stdout, stderr = self.compile_kernel(cmd)
+            logs.append([ret, stdout, stderr])
+        return (files, logs)
     
     def setstages(self, asm, obj, final):
         """
