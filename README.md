@@ -6,19 +6,19 @@ Accelerates configuration and usage of compilers from python.
 ## Tests
 ### pytest
 ```
-test/test_gnu.py::test_name PASSED                                                                               [  9%]
-test/test_gnu.py::test_path PASSED                                                                               [ 18%]
-test/test_gnu.py::test_stages PASSED                                                                             [ 27%]
-test/test_gnu.py::test_static PASSED                                                                             [ 36%]
-test/test_gnu.py::test_includes PASSED                                                                           [ 45%]
-test/test_gnu.py::test_libpath PASSED                                                                            [ 54%]
-test/test_gnu.py::test_libs PASSED                                                                               [ 63%]
-test/test_gnu.py::test_opts PASSED                                                                               [ 72%]
-test/test_opifex.py::test_pytest PASSED                                                                          [ 81%]
-test/test_opifex.py::test_opifex PASSED                                                                          [ 90%]
-test/test_opifex.py::test_gnu PASSED                                                                             [100%]
+test/test_gnu.py::test_name PASSED                                                      [  9%]
+test/test_gnu.py::test_path PASSED                                                      [ 18%]
+test/test_gnu.py::test_stages PASSED                                                    [ 27%]
+test/test_gnu.py::test_static PASSED                                                    [ 36%]
+test/test_gnu.py::test_includes PASSED                                                  [ 45%]
+test/test_gnu.py::test_libpath PASSED                                                   [ 54%]
+test/test_gnu.py::test_libs PASSED                                                      [ 63%]
+test/test_gnu.py::test_opts PASSED                                                      [ 72%]
+test/test_opifex.py::test_pytest PASSED                                                 [ 81%]
+test/test_opifex.py::test_opifex PASSED                                                 [ 90%]
+test/test_opifex.py::test_gnu PASSED                                                    [100%]
 
-================================================= 11 passed in 0.11s ==================================================
+===================================== 11 passed in 0.11s =====================================
 ```
 ### coverage
 ```
