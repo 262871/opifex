@@ -50,7 +50,7 @@ class gnu:
         asmfiles = [ (dir / file.stem).with_suffix('.s') for file in cppfiles ]
         outputs = ' -o ' + ' '.join([gnu.safe(file) for file in asmfiles])
         
-        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes])
+        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes]) if len(self.includes) != 0 else ''
         options = ' ' + ' '.join(self.options)
         
         return (asmfiles, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' -S ' + inputs + incldirs + outputs + options)
@@ -64,10 +64,24 @@ class gnu:
         objfiles = [ (dir / file.stem).with_suffix('.obj') for file in files ]
         outputs = ' -o ' + ' '.join([gnu.safe(file) for file in objfiles])
         
-        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes])
+        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes]) if len(self.includes) != 0 and not self.outasm else ''
         options = ' ' + ' '.join(self.options)
         
         return (objfiles, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' -c ' + inputs + incldirs + outputs + options)
+
+    def final_cmd(self, files):        
+        inputs = ' '.join([gnu.safe(file) for file in files])
+        outfile = self.builddir / self.target
+        output = ' -o ' + gnu.safe(outfile)
+        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes]) if len(self.includes) != 0 and not (self.outasm or self.outobj) else ''
+        options = ' ' + ' '.join(self.options)
+        
+        libpaths = ' -L' + ' -L'.join([gnu.safe(libpath) for libpath in self.libpaths]) if len(self.libpaths) != 0 else ''
+        libs = ' -l' + ' -l'.join(self.libs) if len(self.libs) != 0 else ''
+        
+        static = ' -static' if self.static else ''
+        
+        return (outfile, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' ' + inputs + incldirs + output + options + libpaths + libs + static)
     
     def compile(self, files):
         """
