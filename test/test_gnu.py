@@ -48,3 +48,8 @@ def test_opts(compiler: gnu):
     assert len(compiler.options) == 5
     compiler.discardopts('-pedantic')
     assert len(compiler.options) == 4
+
+def test_compile(compiler: gnu):
+    files = [pathlib.Path('mock/main.cpp')]
+    executable = compiler.compile(files)
+    assert executable

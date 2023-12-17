@@ -1,3 +1,4 @@
+import os
 import pathlib
 
 class gnu:
@@ -28,7 +29,17 @@ class gnu:
         [self.addlibs(elem) for elem in kwargs.get('libraries', [])]
         
         self.options = set()
-        [self.addopts(elem) for elem in kwargs.get('options', {'-Wall', '-Wextra', '-pedantic', '-Werror'})] 
+        [self.addopts(elem) for elem in kwargs.get('options', {'-Wall', '-Wextra', '-pedantic', '-Werror'})]
+        
+        self.target = kwargs.get('target', pathlib.Path('.').absolute().stem + '_' + self.name)
+        self.builddir = kwargs.get('builddir', pathlib.Path('build/').absolute())
+        
+    def compile(self, files):
+        """
+        Run compiler with internal configuration and files as input and return the path(s) to the output files in builddir.
+        """
+        os.makedirs(self.builddir, exist_ok=True)
+        return files
     
     def setstages(self, asm, obj, final):
         """
