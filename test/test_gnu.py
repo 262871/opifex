@@ -30,3 +30,9 @@ def test_static(compiler):
     assert compiler.static == True
     compiler.setstatic(False)
     assert compiler.static == False
+
+def test_libpath(compiler):
+    compiler.addlibpaths('c:/src/boost_1_82_0/libs')
+    assert len(compiler.libpaths) == 1
+    compiler.discardlibpaths('c:/src/boost_1_82_0/libs')
+    assert len(compiler.libpaths) == 0
