@@ -3,6 +3,27 @@
 # opifex
 Accelerates configuration and usage of compilers from python.
 
+## Quickstart
+opifex is designed to be convenient and easy to use while promoting correct use. There are many different ways of accessing most of its functionality. To get started, simply import opifex and create a compiler object by providing the filepath to it along with a tool chain name to distinguish it from other compiler configurations. You can optionally use named key word arguments to configure the compiler immediately upon creation, or you may use functions such as addincludes(*includes) or addopts(*opts) to add one or many of each configuration. These functions can also be chained if you prefer.
+```
+# ...
+gcc = gnu('c:/msys64/mingw64/bin/g++.exe', 'mingw64')
+
+gcc.addincludes(['C:/src/VulkanSDK/Include', 'C:/src/volk'])
+gcc.setstages(asm=True, obj=False, final=True)
+
+# Default options are {'-Wall', '-Wextra', '-pedantic', '-Werror'}
+# and '-static', which is disabled by calling .setstatic(False)
+gcc.addopts('-O3').discardopts('-pedantic')
+
+# Here 'files' would be the cpp files of the project
+program_filepath, compiler_output = gcc.compile(files)
+for ret_code, stdout, stderr in compiler_output:
+    print(stdout)
+    print(stderr)
+# ...
+```
+
 ## Tests
 ### pytest
 ```
