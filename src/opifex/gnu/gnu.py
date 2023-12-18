@@ -1,3 +1,4 @@
+import asyncio
 import os
 import pathlib
 import subprocess
@@ -41,6 +42,11 @@ class gnu:
         """
         task = subprocess.run(cmd, env=env, capture_output=True, text=True)
         return (task.returncode, task.stdout, task.stderr)
+    
+    async def async_compile_kernel(self, cmd):
+        task = await asyncio.create_subprocess_shell(cmd, stderr=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE)
+        stdout, stderr = await task.communicate()
+        return (task.returncode, stdout.decode(), stderr.decode())
     
     @staticmethod
     def safe(path):
@@ -132,7 +138,37 @@ class gnu:
         env = os.environ 
         env['PATH'] = str(self.path.parent.resolve()) + os.pathsep + os.environ['PATH']
         return env
-
+    
+    def create_prefix(self):
+        """
+        Create a prefex to prepend to commands to set the e
+        """
+        return 'cd ' + gnu.safe(self.path.parent) + ' && '
+    
+    async def async_compile(self, files):
+        """
+        Run compiler concurrently, with internal configuration and files as input and return the path(s) to the output files in builddir.
+        """
+        os.makedirs(self.builddir, exist_ok=True)
+        logs = []
+        failed = False
+        prefix = self.create_prefix()
+        if self.outasm:
+            files, command = self.asm_command(files)
+            ret, stdout, stderr = await self.async_compile_kernel(prefix + ' '.join(command))
+            failed = False if ret == 0 else True
+            logs.append([ret, stdout, stderr])
+        if self.outobj and not failed:
+            files, command = self.obj_command(files)
+            ret, stdout, stderr = await self.async_compile_kernel(prefix + ' '.join(command))
+            failed = False if ret == 0 else True
+            logs.append([ret, stdout, stderr])
+        if self.outfinal and not failed:
+            files, command = self.final_command(files)
+            ret, stdout, stderr = await self.async_compile_kernel(prefix + ' '.join(command))
+            logs.append([ret, stdout, stderr])
+        return (files, logs)
+    
     def compile(self, files):
         """
         Run compiler with internal configuration and files as input and return the path(s) to the output files in builddir.
