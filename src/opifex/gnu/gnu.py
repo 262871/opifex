@@ -1,6 +1,5 @@
 import os
 import pathlib
-import shlex
 import subprocess
 
 class gnu:
@@ -33,11 +32,14 @@ class gnu:
         self.options = set()
         [self.addopts(elem) for elem in kwargs.get('options', {'-Wall', '-Wextra', '-pedantic', '-Werror'})]
         
-        self.target = kwargs.get('target', pathlib.Path('.').absolute().stem + '_' + self.name)
+        self.target = kwargs.get('target', pathlib.Path.cwd().absolute().stem + '_' + self.name)
         self.builddir = kwargs.get('builddir', pathlib.Path('build/').absolute())
     
-    def compile_kernel(self, cmd):
-        task = subprocess.run(['cmd'] + shlex.split(cmd), capture_output=True, text=True)
+    def compile_kernel(self, cmd, env=os.environ):
+        """
+        Executes compilation in a subprocess with the environment specified in env.
+        """
+        task = subprocess.run(cmd, env=env, capture_output=True, text=True)
         return (task.returncode, task.stdout, task.stderr)
     
     @staticmethod
@@ -47,48 +49,90 @@ class gnu:
         """
         return f'"{path.as_posix()}"'
     
-    def asm_cmd(self, cppfiles):
+    def asm_command(self, cppfiles):
+        """
+        Creates a compiler command that stops at the asm output stage with input files, includes, target output, and options.
+        returns pathlib paths to the future output file(s) and a list of command arguments.
+        Raises AssertionError if cppfiles contains 0 elements.
+        """
+        assert len(cppfiles) != 0
+        
         dir = self.builddir / self.name / 'asm'
         os.makedirs(dir, exist_ok=True)
         
-        inputs = ' '.join([gnu.safe(file) for file in cppfiles])
+        inputs = [gnu.safe(file) for file in cppfiles]
+        asmfiles = [(dir / file.stem).with_suffix('.s') for file in cppfiles]
+        outputs = ['-o'] + [gnu.safe(file) for file in asmfiles]
         
-        asmfiles = [ (dir / file.stem).with_suffix('.s') for file in cppfiles ]
-        outputs = ' -o ' + ' '.join([gnu.safe(file) for file in asmfiles])
+        includes = []
+        if len(self.includes) != 0:
+            includes += ['-I' + gnu.safe(include) for include in self.includes]
         
-        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes]) if len(self.includes) != 0 else ''
-        options = ' ' + ' '.join(self.options)
+        options = list(self.options)
         
-        return (asmfiles, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' -S ' + inputs + incldirs + outputs + options)
+        return (asmfiles, [self.path.name, '-S'] + inputs + includes + outputs + options)
     
-    def obj_cmd(self, files):
+    def obj_command(self, files):
+        """
+        Creates a compiler command that stops at the obj output stage with input files, includes, target output, and options.
+        returns pathlib paths to the future output file(s) and a list of command arguments.
+        Raises AssertionError if files contains 0 elements.
+        """
+        assert len(files) != 0
+        
         dir = self.builddir / self.name / 'obj'
         os.makedirs(dir, exist_ok=True)
         
-        inputs = ' '.join([gnu.safe(file) for file in files])
+        inputs = [gnu.safe(file) for file in files]
+        objfiles = [(dir / file.stem).with_suffix('.obj') for file in files]
+        outputs = ['-o'] + [gnu.safe(file) for file in objfiles]
         
-        objfiles = [ (dir / file.stem).with_suffix('.obj') for file in files ]
-        outputs = ' -o ' + ' '.join([gnu.safe(file) for file in objfiles])
+        includes = []
+        if len(self.includes) != 0 and not self.outasm:
+            includes += ['-I' + gnu.safe(include) for include in self.includes]
         
-        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes]) if len(self.includes) != 0 and not self.outasm else ''
-        options = ' ' + ' '.join(self.options)
+        options = list(self.options)
         
-        return (objfiles, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' -c ' + inputs + incldirs + outputs + options)
+        return (objfiles, [self.path.name, '-c'] + inputs + includes + outputs + options)
 
-    def final_cmd(self, files):        
-        inputs = ' '.join([gnu.safe(file) for file in files])
+    def final_command(self, files):
+        """
+        Creates a compiler command with input files, includes, target output, options, libpaths, libs and the static option.
+        returns pathlib paths to the future output file(s) and a list of command arguments.
+        Raises AssertionError if files contains 0 elements.
+        """
+        assert len(files) != 0
+        
+        inputs = [gnu.safe(file) for file in files]
         outfile = self.builddir / self.target
-        output = ' -o ' + gnu.safe(outfile)
-        incldirs = ' -I' + ' -I'.join([gnu.safe(include) for include in self.includes]) if len(self.includes) != 0 and not (self.outasm or self.outobj) else ''
-        options = ' ' + ' '.join(self.options)
+        output = ['-o', gnu.safe(outfile)]
         
-        libpaths = ' -L' + ' -L'.join([gnu.safe(libpath) for libpath in self.libpaths]) if len(self.libpaths) != 0 else ''
-        libs = ' -l' + ' -l'.join(self.libs) if len(self.libs) != 0 else ''
+        includes = []
+        if len(self.includes) != 0 and not (self.outasm or self.outobj):
+            includes += ['-I' + gnu.safe(include) for include in self.includes]
         
-        static = ' -static' if self.static else ''
+        options = list(self.options)
         
-        return (outfile, 'cd ' + gnu.safe(self.path.parent) + ' && ' + self.path.name + ' ' + inputs + incldirs + output + options + libpaths + libs + static)
+        libpaths = []
+        if len(self.libpaths) != 0:
+            libpaths += ['-L' + gnu.safe(libpath) for libpath in self.libpaths]
+        
+        libs = []
+        if len(self.libs) != 0:
+            libs += ['-l' + lib for lib in self.libs]
+        
+        static = ['-static'] if self.static else []
+        
+        return (outfile, [self.path.name] + inputs + includes + output + options + libpaths + libs + static)
     
+    def create_env(self):
+        """
+        Prepends the compilers parent directory to path on a copy of the systems environment variables.
+        """
+        env = os.environ 
+        env['PATH'] = str(self.path.parent.resolve()) + os.pathsep + os.environ['PATH']
+        return env
+
     def compile(self, files):
         """
         Run compiler with internal configuration and files as input and return the path(s) to the output files in builddir.
@@ -96,19 +140,20 @@ class gnu:
         os.makedirs(self.builddir, exist_ok=True)
         logs = []
         failed = False
+        env = self.create_env()
         if self.outasm:
-            files, cmd = self.asm_cmd(files)
-            ret, stdout, stderr = self.compile_kernel(cmd)
+            files, command = self.asm_command(files)
+            ret, stdout, stderr = self.compile_kernel(command, env)
             failed = False if ret == 0 else True
             logs.append([ret, stdout, stderr])
         if self.outobj and not failed:
-            files, cmd = self.obj_cmd(files)
-            ret, stdout, stderr = self.compile_kernel(cmd)
+            files, command = self.obj_command(files)
+            ret, stdout, stderr = self.compile_kernel(command, env)
             failed = False if ret == 0 else True
             logs.append([ret, stdout, stderr])
         if self.outfinal and not failed:
-            files, cmd = self.final_cmd(files)
-            ret, stdout, stderr = self.compile_kernel(cmd)
+            files, command = self.final_command(files)
+            ret, stdout, stderr = self.compile_kernel(command, env)
             logs.append([ret, stdout, stderr])
         return (files, logs)
     

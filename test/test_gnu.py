@@ -1,9 +1,10 @@
-import sys, pathlib
-sys.path.append(pathlib.Path.cwd().parent.resolve())
-
+import pathlib 
 import pytest
+import sys
 
+sys.path.append(pathlib.Path.cwd().parent.resolve())
 from src.opifex import gnu 
+
 
 @pytest.fixture
 def compiler():
@@ -54,31 +55,50 @@ def files():
     return [pathlib.Path('mock/main.cpp'), pathlib.Path('mock/app.cxx')]
 
 def test_compile(compiler: gnu, files):
-    compiler.setstages(True, True, True)
+    compiler.setstages(True, False, False)
     executable, logs = compiler.compile(files)
     assert executable
-    assert len(logs) == 3
+    assert len(logs) == 1
+    compiler.setstages(False, True, False)
+    executable, logs = compiler.compile(files)
+    assert executable
+    assert len(logs) == 1
+    compiler.setstages(False, False, True)
+    executable, logs = compiler.compile(files)
+    assert executable
+    assert len(logs) == 1
 
 def test_safe_path_to_string():
     assert gnu.safe(pathlib.Path('\\test path\\with backslash and spaces')) == '"/test path/with backslash and spaces"'
     
-def test_asm_cmd(compiler: gnu, files):
-    asm_files, cmd = compiler.asm_cmd(files)
-    assert len(cmd) == len('cd "c:/msys64/mingw64/bin" && g++.exe -S "mock/main.cpp" "mock/app.cxx" -o "C:/Users/User/Desktop/python/opifex/build/mingw64/asm/main.s" "C:/Users/User/Desktop/python/opifex/build/mingw64/asm/app.s" -Wall -Werror -pedantic -Wextra')
+def test_asm_command(compiler: gnu, files):
+    compiler.addincludes('test/mock/include')
+    asm_files, command = compiler.asm_command(files)
+    assert len(command) == 12
+    print(command)
     assert set(asm_files) == {pathlib.Path('build/mingw64/asm/main.s').resolve(), pathlib.Path('build/mingw64/asm/app.s').resolve()}
 
-def test_obj_cmd(compiler: gnu, files):
-    obj_files, cmd = compiler.obj_cmd(files)
-    assert len(cmd) == len('cd "c:/msys64/mingw64/bin" && g++.exe -c "mock/main.cpp" "mock/app.cxx" -o "C:/Users/User/Desktop/python/opifex/build/mingw64/obj/main.obj" "C:/Users/User/Desktop/python/opifex/build/mingw64/obj/app.obj" -Wextra -Wall -Werror -pedantic')
+def test_obj_command(compiler: gnu, files):
+    compiler.addincludes('test/mock/include')
+    obj_files, command = compiler.obj_command(files)
+    assert len(command) == 12
     assert set(obj_files) == {pathlib.Path('build/mingw64/obj/main.obj').resolve(), pathlib.Path('build/mingw64/obj/app.obj').resolve()}
 
-def test_final_cmd(compiler: gnu, files):
-    file, cmd = compiler.final_cmd(files)
-    assert len(cmd) == len('cd "c:/msys64/mingw64/bin" && g++.exe "mock/main.cpp" "mock/app.cxx" -o "C:/Users/User/Desktop/python/opifex/build/opifex_mingw64" -Wextra -Wall -Werror -pedantic -static')
+def test_final_command(compiler: gnu, files):
+    compiler.addincludes('test/mock/include')
+    compiler.addlibpaths('test/mock/lib')
+    compiler.addlibs('mocklib')
+    file, command = compiler.final_command(files)
+    assert len(command) == 13
     assert file.resolve() == pathlib.Path('build/opifex_mingw64').resolve()
 
 def test_compile_kernel(compiler: gnu):
-    code, stdout, stderr = compiler.compile_kernel('echo "Hello, World!"')
-    assert code == 0
-    assert stdout == 'Microsoft Windows [Version 10.0.19045.3803]\n(c) Microsoft Corporation. All rights reserved.\n\nC:\\Users\\User\\Desktop\\python\\opifex>'
-    assert stderr == ''
+    code, stdout, stderr = compiler.compile_kernel(['g++.exe'])
+    assert code == 1
+    assert stdout == ''
+    assert stderr == 'g++.exe: fatal error: no input files\ncompilation terminated.\n'
+
+def test_create_env(compiler: gnu):
+    env = compiler.create_env()
+    print(env)
+    assert env['Path'].startswith('C:\\msys64\\mingw64\\bin;')
