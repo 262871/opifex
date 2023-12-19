@@ -1,10 +1,7 @@
-import asyncio
 import pathlib 
 import pytest
-import sys
 
-sys.path.append(pathlib.Path.cwd().parent.resolve())
-from src.opifex import gnu 
+from opifex import gnu 
 
 
 @pytest.fixture
