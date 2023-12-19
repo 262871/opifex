@@ -57,12 +57,12 @@ def files():
 
 def test_compile(compiler: gnu, files):
     compiler.setstages(True, False, False)
-    executable, logs = compiler.compile(files)
-    assert executable
+    outfiles, logs = compiler.compile(files)
+    assert outfiles
     assert len(logs) == 1
     compiler.setstages(False, True, False)
-    executable, logs = compiler.compile(files)
-    assert executable
+    outfiles, logs = compiler.compile(files)
+    assert outfiles
     assert len(logs) == 1
     compiler.setstages(False, False, True)
     executable, logs = compiler.compile(files)
@@ -72,12 +72,12 @@ def test_compile(compiler: gnu, files):
 @pytest.mark.asyncio
 async def test_async_compile(compiler: gnu, files):
     compiler.setstages(True, False, False)
-    executable, logs = await compiler.async_compile(files)
-    assert executable
+    outfiles, logs = await compiler.async_compile(files)
+    assert outfiles
     assert len(logs) == 1
     compiler.setstages(False, True, False)
-    executable, logs = await compiler.async_compile(files)
-    assert executable
+    outfiles, logs = await compiler.async_compile(files)
+    assert outfiles
     assert len(logs) == 1
     compiler.setstages(False, False, True)
     executable, logs = await compiler.async_compile(files)

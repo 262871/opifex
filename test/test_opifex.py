@@ -11,3 +11,6 @@ def test_opifex():
 
 def test_gnu():
     assert opifex.gnu
+
+def test_msvc():
+    assert opifex.msvc
