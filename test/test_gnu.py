@@ -1,3 +1,4 @@
+import asyncio
 import pathlib 
 import pytest
 import sys
@@ -68,7 +69,22 @@ def test_compile(compiler: gnu, files):
     assert executable
     assert len(logs) == 1
 
-def test_safe_path_to_string():
+@pytest.mark.asyncio
+async def test_async_compile(compiler: gnu, files):
+    compiler.setstages(True, False, False)
+    executable, logs = await compiler.async_compile(files)
+    assert executable
+    assert len(logs) == 1
+    compiler.setstages(False, True, False)
+    executable, logs = await compiler.async_compile(files)
+    assert executable
+    assert len(logs) == 1
+    compiler.setstages(False, False, True)
+    executable, logs = await compiler.async_compile(files)
+    assert executable
+    assert len(logs) == 1
+
+def test_safe():
     assert gnu.safe(pathlib.Path('\\test path\\with backslash and spaces')) == '"/test path/with backslash and spaces"'
     
 def test_asm_command(compiler: gnu, files):
@@ -98,7 +114,17 @@ def test_compile_kernel(compiler: gnu):
     assert stdout == ''
     assert stderr == 'g++.exe: fatal error: no input files\ncompilation terminated.\n'
 
+@pytest.mark.asyncio
+async def test_async_compile_kernel(compiler: gnu):
+    code, stdout, stderr = await compiler.async_compile_kernel('c:/msys64/mingw64/bin/g++.exe')
+    assert code == 1
+    assert stdout == ''
+    assert stderr == 'g++.exe: fatal error: no input files\ncompilation terminated.\r\n'
+
 def test_create_env(compiler: gnu):
     env = compiler.create_env()
     print(env)
     assert env['Path'].startswith('C:\\msys64\\mingw64\\bin;')
+
+def test_create_prefix(compiler: gnu):
+    assert compiler.create_prefix() == 'cd "c:/msys64/mingw64/bin" && '

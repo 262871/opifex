@@ -27,35 +27,38 @@ for ret_code, stdout, stderr in compiler_output:
 ## Tests
 ### pytest
 ```
-test/test_gnu.py::test_name PASSED                             [  5%]
-test/test_gnu.py::test_path PASSED                             [ 11%]
-test/test_gnu.py::test_stages PASSED                           [ 16%]
-test/test_gnu.py::test_static PASSED                           [ 22%]
-test/test_gnu.py::test_includes PASSED                         [ 27%]
-test/test_gnu.py::test_libpath PASSED                          [ 33%]
-test/test_gnu.py::test_libs PASSED                             [ 38%]
-test/test_gnu.py::test_opts PASSED                             [ 44%]
-test/test_gnu.py::test_compile PASSED                          [ 50%]
-test/test_gnu.py::test_safe_path_to_string PASSED              [ 55%]
-test/test_gnu.py::test_asm_command PASSED                      [ 61%]
-test/test_gnu.py::test_obj_command PASSED                      [ 66%]
-test/test_gnu.py::test_final_command PASSED                    [ 72%]
-test/test_gnu.py::test_compile_kernel PASSED                   [ 77%]
-test/test_gnu.py::test_create_env PASSED                       [ 83%]
-test/test_opifex.py::test_pytest PASSED                        [ 88%]
-test/test_opifex.py::test_opifex PASSED                        [ 94%]
-test/test_opifex.py::test_gnu PASSED                           [100%]
+test/test_gnu.py::test_name PASSED                                       [  4%]
+test/test_gnu.py::test_path PASSED                                       [  9%]
+test/test_gnu.py::test_stages PASSED                                     [ 14%]
+test/test_gnu.py::test_static PASSED                                     [ 19%]
+test/test_gnu.py::test_includes PASSED                                   [ 23%]
+test/test_gnu.py::test_libpath PASSED                                    [ 28%]
+test/test_gnu.py::test_libs PASSED                                       [ 33%]
+test/test_gnu.py::test_opts PASSED                                       [ 38%]
+test/test_gnu.py::test_compile PASSED                                    [ 42%]
+test/test_gnu.py::test_async_compile PASSED                              [ 47%]
+test/test_gnu.py::test_safe PASSED                                       [ 52%]
+test/test_gnu.py::test_asm_command PASSED                                [ 57%]
+test/test_gnu.py::test_obj_command PASSED                                [ 61%]
+test/test_gnu.py::test_final_command PASSED                              [ 66%]
+test/test_gnu.py::test_compile_kernel PASSED                             [ 71%]
+test/test_gnu.py::test_async_compile_kernel PASSED                       [ 76%]
+test/test_gnu.py::test_create_env PASSED                                 [ 80%]
+test/test_gnu.py::test_create_prefix PASSED                              [ 85%]
+test/test_opifex.py::test_pytest PASSED                                  [ 90%]
+test/test_opifex.py::test_opifex PASSED                                  [ 95%]
+test/test_opifex.py::test_gnu PASSED                                     [100%]
 
-======================== 18 passed in 0.36s =========================
+============================= 21 passed in 0.50s ==============================
 ```
 ### coverage
 ```
 Name                     Stmts   Miss  Cover
 --------------------------------------------
 src\opifex\__init__.py       1      0   100%
-src\opifex\gnu\gnu.py      140      0   100%
-test\test_gnu.py            85      0   100%
+src\opifex\gnu\gnu.py      167      0   100%
+test\test_gnu.py           108      0   100%
 test\test_opifex.py          9      0   100%
 --------------------------------------------
-TOTAL                      235      0   100%
+TOTAL                      285      0   100%
 ```
