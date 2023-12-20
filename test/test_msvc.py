@@ -29,3 +29,9 @@ def test_includes(compiler: msvc):
     compiler.discardincludes('C:/src/volk')
     assert len(compiler.includes) == 1
 
+def test_libpath(compiler: msvc):
+    compiler.addlibpaths('c:/src/boost_1_82_0/libs')
+    assert len(compiler.libpaths) == 1
+    compiler.discardlibpaths('c:/src/boost_1_82_0/libs')
+    assert len(compiler.libpaths) == 0
+

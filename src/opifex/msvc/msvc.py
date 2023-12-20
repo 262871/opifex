@@ -22,6 +22,8 @@ class msvc:
     
         self.includes = set()
         [self.addincludes(elem) for elem in kwargs.get('includes', [])]
+        self.libpaths = set()
+        [self.addlibpaths(elem) for elem in kwargs.get('libpaths', [])]
     
     def setstages(self, asm, obj, final):
         """
@@ -57,5 +59,24 @@ class msvc:
         """
         for include in includes:
             self.includes.remove(pathlib.Path(include))
+        return self
+    
+    def addlibpaths(self, *libpaths):
+        """
+        Adds each path-like entry in libpaths. Ignores duplicates (except for symlinc non-identity).
+        Raises AssertionError if not a valid directory.
+        """
+        for libpath in libpaths:
+            dir = pathlib.Path(libpath)
+            assert dir.is_dir(), f'gnu.addlibpaths(). Each libpath in libpaths must be a valid directory.\n{dir.as_posix()} was not found.'
+            self.libpaths.add(dir)
+        return self
+    
+    def discardlibpaths(self, *libpaths):
+        """
+        Removes each path-like entry in libpaths.
+        """
+        for libpath in libpaths:
+            self.libpaths.remove(pathlib.Path(libpath))
         return self
     
