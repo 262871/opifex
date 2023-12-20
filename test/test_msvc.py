@@ -47,3 +47,8 @@ def test_nodefaultlibs(compiler: msvc):
     compiler.discardnodefaultlibs('boost_1_82_0')
     assert len(compiler.nodefaultlibs) == 0
 
+def test_opts(compiler: msvc):
+    compiler.addopts('/O2')
+    assert len(compiler.options) == 4
+    compiler.discardopts('/options:strict')
+    assert len(compiler.options) == 3
