@@ -24,6 +24,11 @@ class msvc:
         [self.addincludes(elem) for elem in kwargs.get('includes', [])]
         self.libpaths = set()
         [self.addlibpaths(elem) for elem in kwargs.get('libpaths', [])]
+        self.defaultlibs = set()
+        [self.adddefaultlibs(elem) for elem in kwargs.get('defaultlibs', [])]
+        self.nodefaultlibs = set()
+        [self.addnodefaultlibs(elem) for elem in kwargs.get('nodefaultlibs', [])]
+        
     
     def setstages(self, asm, obj, final):
         """
@@ -78,5 +83,41 @@ class msvc:
         """
         for libpath in libpaths:
             self.libpaths.remove(pathlib.Path(libpath))
+        return self
+    
+    def adddefaultlibs(self, *libnames):
+        """
+        Adds each string-like entry in libnames.
+        Raises AssertionError if entry doesn't start with - or contains spaces.
+        """
+        for libname in libnames:
+            assert ' ' not in libname, f'gnu.addlibs(). libnames must not contain spaces. libname was [{libname}].'
+            self.defaultlibs.add(libname)
+        return self
+    
+    def discarddefaultlibs(self, *libnames):
+        """
+        Removes each string-like entry in libnames.
+        """
+        for libname in libnames:
+            self.defaultlibs.remove(libname)
+        return self
+    
+    def addnodefaultlibs(self, *libnames):
+        """
+        Adds each string-like entry in libnames.
+        Raises AssertionError if entry doesn't start with - or contains spaces.
+        """
+        for libname in libnames:
+            assert ' ' not in libname, f'gnu.addlibs(). libnames must not contain spaces. libname was [{libname}].'
+            self.nodefaultlibs.add(libname)
+        return self
+    
+    def discardnodefaultlibs(self, *libnames):
+        """
+        Removes each string-like entry in libnames.
+        """
+        for libname in libnames:
+            self.nodefaultlibs.remove(libname)
         return self
     

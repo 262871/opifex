@@ -35,3 +35,15 @@ def test_libpath(compiler: msvc):
     compiler.discardlibpaths('c:/src/boost_1_82_0/libs')
     assert len(compiler.libpaths) == 0
 
+def test_defaultlibs(compiler: msvc):
+    compiler.adddefaultlibs('User32')
+    assert len(compiler.defaultlibs) == 1
+    compiler.discarddefaultlibs('User32')
+    assert len(compiler.defaultlibs) == 0
+
+def test_nodefaultlibs(compiler: msvc):
+    compiler.addnodefaultlibs('boost_1_82_0')
+    assert len(compiler.nodefaultlibs) == 1
+    compiler.discardnodefaultlibs('boost_1_82_0')
+    assert len(compiler.nodefaultlibs) == 0
+
