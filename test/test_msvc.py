@@ -22,3 +22,10 @@ def test_static(compiler: msvc):
     assert compiler.static == True
     compiler.setstatic(False)
     assert compiler.static == False
+
+def test_includes(compiler: msvc):
+    compiler.addincludes('C:/src/VulkanSDK/Include', 'C:/src/volk')
+    assert len(compiler.includes) == 2
+    compiler.discardincludes('C:/src/volk')
+    assert len(compiler.includes) == 1
+

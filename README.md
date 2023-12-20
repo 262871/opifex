@@ -13,7 +13,8 @@ gcc.addincludes(['C:/src/VulkanSDK/Include', 'C:/src/volk'])
 gcc.setstages(asm=True, obj=False, final=True)
 
 # Default options are {'-Wall', '-Wextra', '-pedantic', '-Werror'}
-# and '-static', which is disabled by calling .setstatic(False)
+# and {'/W4', '/EHsc', '/options:strict'} on msvc
+# '-static' is separate and disabled by calling .setstatic(False)
 gcc.addopts('-O3').discardopts('-pedantic')
 
 # Here 'files' would be the cpp files of the project
