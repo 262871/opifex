@@ -1,3 +1,4 @@
+import os
 import pathlib 
 
 class msvc:
@@ -42,6 +43,19 @@ class msvc:
         """
         return f'"{str(path)}"'
     
+    def asm_output(self, files = []):
+        """
+        return a component command that instructs the compiler to output asm during compilation if self.outasm and creates a folder for them in builddir
+        and optionally process the filepaths in files and return their corresponding targets in the new location
+        """
+        dir = self.builddir / self.name / 'asm'
+        command = []
+        asm = []
+        if self.outasm:
+            os.makedirs(dir, exist_ok=True)
+            command = ['/FAu /Fa' + msvc.safe(self.builddir / self.name / 'asm')]
+            asm = [(dir / file.stem).with_suffix('.asm') for file in files]
+        return command, asm
     def setstages(self, asm, obj, final):
         """
         Set which stages to intermit at and output during compilation. 
