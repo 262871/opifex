@@ -32,7 +32,7 @@ class msvc:
         self.options = set()
         [self.addopts(elem) for elem in kwargs.get('options', {'/W4', '/EHsc', '/options:strict'})]
         
-        self.target = kwargs.get('target', pathlib.Path.cwd().absolute().stem + '_' + self.name)
+        self.target = kwargs.get('target', pathlib.Path.cwd().absolute().stem.replace(' ', '_') + '_' + self.name)
         self.builddir = kwargs.get('builddir', pathlib.Path('build/').absolute())
     
     @staticmethod
