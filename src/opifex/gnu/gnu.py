@@ -33,7 +33,7 @@ class gnu:
         self.options = set()
         [self.addopts(elem) for elem in kwargs.get('options', {'-Wall', '-Wextra', '-pedantic', '-Werror'})]
         
-        self.target = kwargs.get('target', pathlib.Path.cwd().absolute().stem + '_' + self.name)
+        self.target = kwargs.get('target', pathlib.Path.cwd().absolute().stem.replace(' ', '_') + '_' + self.name)
         self.builddir = kwargs.get('builddir', pathlib.Path('build/').absolute())
     
     def compile_kernel(self, cmd, env=os.environ):
