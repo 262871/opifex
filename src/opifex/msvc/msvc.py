@@ -35,6 +35,12 @@ class msvc:
         self.target = kwargs.get('target', pathlib.Path.cwd().absolute().stem + '_' + self.name)
         self.builddir = kwargs.get('builddir', pathlib.Path('build/').absolute())
     
+    @staticmethod
+    def safe(path: pathlib.Path):
+        """
+        Wrap the path in double quotes in case of spaces in path and use double back-slashes as forward slashes are parsed as options.
+        """
+        return f'"{str(path)}"'
     
     def setstages(self, asm, obj, final):
         """

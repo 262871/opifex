@@ -1,3 +1,4 @@
+import pathlib
 import pytest
 
 from opifex import msvc
@@ -52,3 +53,6 @@ def test_opts(compiler: msvc):
     assert len(compiler.options) == 4
     compiler.discardopts('/options:strict')
     assert len(compiler.options) == 3
+
+def test_safe():
+    assert msvc.safe(pathlib.Path('/test path/with fwd-slash and spaces')) == '"\\test path\\with fwd-slash and spaces"'
