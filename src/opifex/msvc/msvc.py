@@ -50,25 +50,27 @@ class msvc:
         """
         dir = self.builddir / self.name / 'asm'
         command = []
-        asm = []
+        asms = []
         if self.outasm:
             os.makedirs(dir, exist_ok=True)
-            command = ['/FAu /Fa' + msvc.safe(self.builddir / self.name / 'asm')]
-            asm = [(dir / file.stem).with_suffix('.asm') for file in files]
-        return command, asm
+            command = ['/FAu /Fa' + msvc.safe(dir)]
+            asms = [(dir / file.stem).with_suffix('.asm') for file in files]
+        return asms, command
     
     def obj_output(self, files):
         """
         return a component command that instructs the compiler to output obj during compilation if self.outobj and creates a folder for them in builddir
         and process the filepaths in files and return their corresponding targets in the new location
         """
+        dir = self.builddir / self.name / 'obj'
         command = []
-        obj = []
+        objs = []
         if self.outobj:
-            os.makedirs(self.builddir / self.name / 'obj', exist_ok=True)
+            os.makedirs(dir, exist_ok=True)
             command = ['/Fo' + msvc.safe(self.builddir / self.name / 'obj')]
-            obj = [(dir / file.stem).with_suffix('.obj') for file in files]
-        return command, obj
+            objs = [(dir / file.stem).with_suffix('.obj') for file in files]
+        return objs, command
+    
     def setstages(self, asm, obj, final):
         """
         Set which stages to intermit at and output during compilation. 
