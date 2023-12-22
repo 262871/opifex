@@ -81,6 +81,13 @@ class msvc:
             os.makedirs(self.builddir, exist_ok=True)
             command = ['/OUT:' + final] + objs
         return final, command
+    
+    def includes_command(self):
+        """
+        return a component command that contains all the includes in self.includes
+        """
+        return ['/I' + msvc.safe(include) for include in self.includes]
+    
     def setstages(self, asm, obj, final):
         """
         Set which stages to intermit at and output during compilation. 
