@@ -106,6 +106,27 @@ class msvc:
         """
         return ['/NODEFAULTLIB:' + msvc.safe(nodefaultlib) for nodefaultlib in self.nodefaultlibs]
     
+    def compile(self, files):
+        """
+        Run compiler and linker with internal configuration and files as input and return the path(s) to the output files in builddir.
+        """
+        asms, fa = self.asm_output(files)
+        objs, fo = self.obj_output(files)
+        includes = self.includes_command()
+        options = [self.options]
+        
+        ret, stdout, stderr = self.compile_kernel(fa + fo + includes + options + files)
+        logs = [[ret, stdout, stderr]]
+        if self.outfinal:
+            target, fe = self.final_output(objs)
+            libpaths = self.libpaths_command()
+            defaultlibs = self.defaultlibs_command()
+            nodefaultlibs = self.nodefaultlibs_command()
+            ret, stdout, stderr = self.link_kernel(fe + libpaths + defaultlibs + nodefaultlibs)
+            logs += [ret, stdout, stderr]
+        
+        return (asms, objs, target, logs)
+    
     def setstages(self, asm, obj, final):
         """
         Set which stages to intermit at and output during compilation. 
