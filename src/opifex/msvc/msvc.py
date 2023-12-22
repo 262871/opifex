@@ -71,6 +71,16 @@ class msvc:
             objs = [(dir / file.stem).with_suffix('.obj') for file in files]
         return objs, command
     
+    def final_output(self, objs):
+        """
+        return a component linker command that instructs the linker to name the output self.target in self.builddir
+        """
+        command = []
+        final = msvc.safe(self.builddir / self.target)
+        if self.outfinal:
+            os.makedirs(self.builddir, exist_ok=True)
+            command = ['/OUT:' + final] + objs
+        return final, command
     def setstages(self, asm, obj, final):
         """
         Set which stages to intermit at and output during compilation. 
