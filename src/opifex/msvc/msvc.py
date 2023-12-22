@@ -94,6 +94,18 @@ class msvc:
         """
         return ['/LIBPATH:' + msvc.safe(libpath) for libpath in self.libpaths]
     
+    def defaultlibs_command(self):
+        """
+        return a component linker command that contains all the defaultlibs in self.defaultlibs
+        """
+        return ['/DEFAULTLIB:' + msvc.safe(defaultlib) for defaultlib in self.defaultlibs]
+    
+    def nodefaultlibs_command(self):
+        """
+        return a component linker command that contains all the nodefaultlibs in self.nodefaultlibs
+        """
+        return ['/NODEFAULTLIB:' + msvc.safe(nodefaultlib) for nodefaultlib in self.nodefaultlibs]
+    
     def setstages(self, asm, obj, final):
         """
         Set which stages to intermit at and output during compilation. 
