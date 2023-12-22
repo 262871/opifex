@@ -88,6 +88,12 @@ class msvc:
         """
         return ['/I' + msvc.safe(include) for include in self.includes]
     
+    def libpaths_command(self):
+        """
+        return a component linker command that contains all the libpaths in self.libpaths
+        """
+        return ['/LIBPATH:' + msvc.safe(libpath) for libpath in self.libpaths]
+    
     def setstages(self, asm, obj, final):
         """
         Set which stages to intermit at and output during compilation. 
