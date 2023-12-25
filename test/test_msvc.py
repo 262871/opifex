@@ -89,6 +89,15 @@ def test_final_output(compiler: msvc, objs):
     target, _ = compiler.final_output(objs)
     assert msvc.safe(target) == '"C:\\Users\\User\\Desktop\\python\\opifex\\build\\opifex_msvc64"'
 
+def test_includes_command(compiler: msvc):
+    compiler.includes = ['include1', 'include2']
+    expected_command = ['/I"include1"', '/I"include2"']
+    assert compiler.includes_command() == expected_command
+
+def test_libpaths_command(compiler: msvc):
+    compiler.libpaths = ['libpath1', 'libpath2']
+    expected_command = ['/LIBPATH:"libpath1"', '/LIBPATH:"libpath2"']
+    assert compiler.libpaths_command() == expected_command
 
 def test_defaultlibs_command(compiler: msvc):
     compiler.defaultlibs = ['lib1', 'lib2']
