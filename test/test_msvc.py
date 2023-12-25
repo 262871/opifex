@@ -56,3 +56,8 @@ def test_opts(compiler: msvc):
 
 def test_safe():
     assert msvc.safe(pathlib.Path('/test path/with fwd-slash and spaces')) == '"\\test path\\with fwd-slash and spaces"'
+
+@pytest.fixture
+def files():
+    return [pathlib.Path('test/mock/main.cpp'), pathlib.Path('test/mock/app.cxx')]
+

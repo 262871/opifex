@@ -50,7 +50,7 @@ def test_opts(compiler: gnu):
 
 @pytest.fixture
 def files():
-    return [pathlib.Path('mock/main.cpp'), pathlib.Path('mock/app.cxx')]
+    return [pathlib.Path('test/mock/main.cpp'), pathlib.Path('test/mock/app.cxx')]
 
 def test_compile(compiler: gnu, files):
     compiler.setstages(True, False, False)
