@@ -71,6 +71,16 @@ def test_asm_output_false(compiler: msvc, files):
     asms, _ = compiler.asm_output(files)
     assert not asms
 
+def test_obj_output_false(compiler: msvc, files):
+    compiler.outobj = False
+    objs, _ = compiler.obj_output(files)
+    assert not objs
+
+def test_obj_output_true(compiler: msvc, files):
+    compiler.outobj = True
+    objs, _ = compiler.obj_output(files)
+    assert len(objs) == len(files)
+
 @pytest.fixture
 def objs():
     return [pathlib.Path('mock/build/msvc64/main.obj'), pathlib.Path('mock/build/msvc64/app.obj')]
