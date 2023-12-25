@@ -79,3 +79,9 @@ def test_final_output(compiler: msvc, objs):
     target, _ = compiler.final_output(objs)
     assert msvc.safe(target) == '"C:\\Users\\User\\Desktop\\python\\opifex\\build\\opifex_msvc64"'
 
+
+def test_defaultlibs_command(compiler: msvc):
+    compiler.defaultlibs = ['lib1', 'lib2']
+    expected_command = ['/DEFAULTLIB:lib1', '/DEFAULTLIB:lib2']
+    assert compiler.defaultlibs_command() == expected_command
+

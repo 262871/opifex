@@ -97,7 +97,7 @@ class msvc:
         """
         return a component linker command that contains all the defaultlibs in self.defaultlibs
         """
-        return ['/DEFAULTLIB:' + msvc.safe(defaultlib) for defaultlib in self.defaultlibs]
+        return ['/DEFAULTLIB:' + defaultlib for defaultlib in self.defaultlibs]
     
     def nodefaultlibs_command(self):
         """
