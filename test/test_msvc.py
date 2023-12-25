@@ -85,3 +85,8 @@ def test_defaultlibs_command(compiler: msvc):
     expected_command = ['/DEFAULTLIB:lib1', '/DEFAULTLIB:lib2']
     assert compiler.defaultlibs_command() == expected_command
 
+def test_nodefaultlibs_command(compiler: msvc):
+    compiler.nodefaultlibs = ['nodefaultlib1', 'nodefaultlib2']
+    expected_command = ['/NODEFAULTLIB:nodefaultlib1', '/NODEFAULTLIB:nodefaultlib2']
+    assert compiler.nodefaultlibs_command() == expected_command
+
