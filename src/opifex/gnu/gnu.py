@@ -186,24 +186,38 @@ class gnu:
         """
         Run compiler with internal configuration and files as input and return the path(s) to the output files in builddir.
         """
-        os.makedirs(self.builddir, exist_ok=True)
-        logs = []
-        failed = False
+        self.makedirs(self.outasm, self.outobj)
         env = self.create_env()
-        if self.outasm:
-            files, command = self.asm_command(files)
-            ret, stdout, stderr = self.compile_kernel(command, env)
-            failed = False if ret == 0 else True
-            logs.append([ret, stdout, stderr])
-        if self.outobj and not failed:
-            files, command = self.obj_command(files)
-            ret, stdout, stderr = self.compile_kernel(command, env)
-            failed = False if ret == 0 else True
-            logs.append([ret, stdout, stderr])
+        logs = {
+            'asm': dict(),
+            'obj': dict(),
+            'final': []
+        }
+        failed = False
+        nfiles = []
+        for file in files:
+            if self.outasm and not failed:
+                nfile, command = self.asm_command(file)
+                ret, stdout, stderr = self.compile_kernel(command, env)
+                failed = False if ret == 0 else True
+                logs['asm'][file] = [ret, stdout, stderr]
+                if self.outobj:
+                    file = nfile
+                else:
+                    nfiles.append(nfile)
+            if self.outobj and not failed:
+                nfile, command = self.obj_command(file)
+                ret, stdout, stderr = self.compile_kernel(command, env)
+                failed = False if ret == 0 else True
+                logs['obj'][file] = [ret, stdout, stderr]
+                nfiles.append(nfile)
+        if self.outasm or self.outobj:
+            files = nfiles
+        
         if self.outfinal and not failed:
             files, command = self.final_command(files)
             ret, stdout, stderr = self.compile_kernel(command, env)
-            logs.append([ret, stdout, stderr])
+            logs['final'] = [ret, stdout, stderr]
         return (files, logs)
     
     def setstages(self, asm, obj, final):
