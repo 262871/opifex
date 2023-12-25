@@ -123,17 +123,18 @@ class msvc:
         asms, fa = self.asm_output(files)
         objs, fo = self.obj_output(files)
         includes = self.includes_command()
-        options = [self.options]
-        
-        ret, stdout, stderr = self.compile_kernel(fa + fo + includes + options + files)
+        options = [option for option in self.options]
+        cmd = fa + fo + includes + options + [str(file.as_posix()) for file in files] + ['/c']
+        ret, stdout, stderr = self.compile_kernel(cmd)
         logs = [[ret, stdout, stderr]]
+        
         if self.outfinal:
             target, fe = self.final_output(objs)
             libpaths = self.libpaths_command()
             defaultlibs = self.defaultlibs_command()
             nodefaultlibs = self.nodefaultlibs_command()
             ret, stdout, stderr = self.link_kernel(fe + libpaths + defaultlibs + nodefaultlibs)
-            logs += [ret, stdout, stderr]
+            logs += [[ret, stdout, stderr]]
         
         return (asms, objs, target, logs)
     
