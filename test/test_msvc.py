@@ -61,3 +61,13 @@ def test_safe():
 def files():
     return [pathlib.Path('test/mock/main.cpp'), pathlib.Path('test/mock/app.cxx')]
 
+def test_asm_output_true(compiler: msvc, files):
+    compiler.outasm = True
+    asms, _ = compiler.asm_output(files)
+    assert len(asms) == len(files)
+
+def test_asm_output_false(compiler: msvc, files):
+    compiler.outasm = False
+    asms, _ = compiler.asm_output(files)
+    assert not asms
+

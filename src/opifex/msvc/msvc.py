@@ -53,7 +53,7 @@ class msvc:
         asms = []
         if self.outasm:
             os.makedirs(dir, exist_ok=True)
-            command = ['/FAu /Fa' + msvc.safe(dir)]
+            command = ['/Fa' + str(dir) + '\\']
             asms = [(dir / file.stem).with_suffix('.asm') for file in files]
         return asms, command
     
@@ -67,7 +67,7 @@ class msvc:
         objs = []
         if self.outobj:
             os.makedirs(dir, exist_ok=True)
-            command = ['/Fo' + msvc.safe(self.builddir / self.name / 'obj')]
+            command = ['/Fo' + str(self.builddir / self.name / 'obj') + '\\']
             objs = [(dir / file.stem).with_suffix('.obj') for file in files]
         return objs, command
     
