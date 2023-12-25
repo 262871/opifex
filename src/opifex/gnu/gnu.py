@@ -51,67 +51,53 @@ class gnu:
     @staticmethod
     def safe(path):
         """
-        Wrap the path in double quotes in case of spaces in path and use forward slashes. 
+        Wrap the path in double quotes in case of spaces in path and use forward slashes. Not to be used with list based non async command generators.
         """
         return f'"{path.as_posix()}"'
     
-    def asm_command(self, cppfiles):
+    def asm_command(self, file, strcallback=str):
         """
         Creates a compiler command that stops at the asm output stage with input files, includes, target output, and options.
         returns pathlib paths to the future output file(s) and a list of command arguments.
-        Raises AssertionError if cppfiles contains 0 elements.
+        Raises AssertionError if files contains 0 elements.
         """
-        assert len(cppfiles) != 0
-        
-        dir = self.builddir / self.name / 'asm'
-        os.makedirs(dir, exist_ok=True)
-        
-        inputs = [gnu.safe(file) for file in cppfiles]
-        asmfiles = [(dir / file.stem).with_suffix('.s') for file in cppfiles]
-        outputs = ['-o'] + [gnu.safe(file) for file in asmfiles]
-        
+        inputs = [strcallback(file.resolve())]
+        asmfile = (self.builddir / self.name / 'asm' / file.stem).with_suffix('.s')
+        outputs = ['-o'] + [strcallback(asmfile)]
         includes = []
         if len(self.includes) != 0:
             includes += ['-I' + gnu.safe(include) for include in self.includes]
         
         options = list(self.options)
         
-        return (asmfiles, [self.path.name, '-S'] + inputs + includes + outputs + options)
+        return (asmfile, [self.path.name, '-S'] + inputs + includes + outputs + options)
     
-    def obj_command(self, files):
+    def obj_command(self, file, strcallback=str):
         """
         Creates a compiler command that stops at the obj output stage with input files, includes, target output, and options.
         returns pathlib paths to the future output file(s) and a list of command arguments.
         Raises AssertionError if files contains 0 elements.
         """
-        assert len(files) != 0
-        
-        dir = self.builddir / self.name / 'obj'
-        os.makedirs(dir, exist_ok=True)
-        
-        inputs = [gnu.safe(file) for file in files]
-        objfiles = [(dir / file.stem).with_suffix('.obj') for file in files]
-        outputs = ['-o'] + [gnu.safe(file) for file in objfiles]
-        
+        inputs = [strcallback(file)]
+        objfile = (self.builddir / self.name / 'obj' / file.stem).with_suffix('.obj')
+        outputs = ['-o'] + [strcallback(objfile)]
         includes = []
         if len(self.includes) != 0 and not self.outasm:
             includes += ['-I' + gnu.safe(include) for include in self.includes]
         
         options = list(self.options)
         
-        return (objfiles, [self.path.name, '-c'] + inputs + includes + outputs + options)
+        return (objfile, [self.path.name, '-c'] + inputs + includes + outputs + options)
 
-    def final_command(self, files):
+    def final_command(self, files, strcallback=str):
         """
         Creates a compiler command with input files, includes, target output, options, libpaths, libs and the static option.
         returns pathlib paths to the future output file(s) and a list of command arguments.
         Raises AssertionError if files contains 0 elements.
         """
-        assert len(files) != 0
-        
-        inputs = [gnu.safe(file) for file in files]
+        inputs = [strcallback(file) for file in files]
         outfile = self.builddir / self.target
-        output = ['-o', gnu.safe(outfile)]
+        output = ['-o', strcallback(outfile)]
         
         includes = []
         if len(self.includes) != 0 and not (self.outasm or self.outobj):
