@@ -109,3 +109,11 @@ def test_nodefaultlibs_command(compiler: msvc):
     expected_command = ['/NODEFAULTLIB:nodefaultlib1', '/NODEFAULTLIB:nodefaultlib2']
     assert compiler.nodefaultlibs_command() == expected_command
 
+def test_compile(compiler: msvc, files):
+    compiler.setstages(True, True, True)
+    result = compiler.compile(files)
+    asms, objs, target, logs = result
+    assert all(asms)
+    assert all(objs)
+    assert target is not None
+    assert len(logs) == 2
