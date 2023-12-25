@@ -26,50 +26,65 @@ for ret_code, stdout, stderr in compiler_output:
 ```
 
 ## Tests
+The current tests execute compilers locally instead of merely simulating the compilers. While this approach might undergo revision in the future, it is currently employed to prevent errors in the relatively intricate APIs.
 ### pytest
 ```
-test/test_gnu.py::test_name PASSED                                       [  3%]
-test/test_gnu.py::test_path PASSED                                       [  6%]
-test/test_gnu.py::test_stages PASSED                                     [  9%]
-test/test_gnu.py::test_static PASSED                                     [ 12%]
-test/test_gnu.py::test_includes PASSED                                   [ 16%]
-test/test_gnu.py::test_libpath PASSED                                    [ 19%]
-test/test_gnu.py::test_libs PASSED                                       [ 22%]
-test/test_gnu.py::test_opts PASSED                                       [ 25%]
-test/test_gnu.py::test_async_compile PASSED                              [ 32%]
-test/test_gnu.py::test_asm_command PASSED                                [ 38%]
-test/test_gnu.py::test_obj_command PASSED                                [ 41%]
-test/test_gnu.py::test_final_command PASSED                              [ 45%]
-test/test_gnu.py::test_compile_kernel PASSED                             [ 48%]
-test/test_gnu.py::test_async_compile_kernel PASSED                       [ 51%]
-test/test_gnu.py::test_create_env PASSED                                 [ 54%]
-test/test_gnu.py::test_create_prefix PASSED                              [ 58%]
-test/test_msvc.py::test_name PASSED                                      [ 61%]
-test/test_msvc.py::test_path PASSED                                      [ 64%]
-test/test_msvc.py::test_stages PASSED                                    [ 67%]
-test/test_msvc.py::test_static PASSED                                    [ 70%]
-test/test_msvc.py::test_includes PASSED                                  [ 74%]
-test/test_msvc.py::test_libpath PASSED                                   [ 77%]
-test/test_msvc.py::test_defaultlibs PASSED                               [ 80%]
-test/test_msvc.py::test_nodefaultlibs PASSED                             [ 83%]
-test/test_msvc.py::test_opts PASSED                                      [ 87%]
-test/test_opifex.py::test_pytest PASSED                                  [ 90%]
-test/test_opifex.py::test_opifex PASSED                                  [ 93%]
-test/test_opifex.py::test_gnu PASSED                                     [ 96%]
-test/test_opifex.py::test_msvc PASSED                                    [100%]
+test/test_gnu.py::test_name PASSED                                      [  2%]
+test/test_gnu.py::test_path PASSED                                      [  4%]
+test/test_gnu.py::test_stages PASSED                                    [  7%]
+test/test_gnu.py::test_static PASSED                                    [  9%]
+test/test_gnu.py::test_includes PASSED                                  [ 11%]
+test/test_gnu.py::test_libpath PASSED                                   [ 14%]
+test/test_gnu.py::test_libs PASSED                                      [ 16%]
+test/test_gnu.py::test_opts PASSED                                      [ 19%]
+test/test_gnu.py::test_compile PASSED                                   [ 21%]
+test/test_gnu.py::test_async_compile PASSED                             [ 23%]
+test/test_gnu.py::test_safe PASSED                                      [ 26%]
+test/test_gnu.py::test_asm_command PASSED                               [ 28%]
+test/test_gnu.py::test_obj_command PASSED                               [ 30%]
+test/test_gnu.py::test_final_command PASSED                             [ 33%]
+test/test_gnu.py::test_compile_kernel PASSED                            [ 35%]
+test/test_gnu.py::test_async_compile_kernel PASSED                      [ 38%]
+test/test_gnu.py::test_create_env PASSED                                [ 40%]
+test/test_gnu.py::test_create_prefix PASSED                             [ 42%]
+test/test_msvc.py::test_name PASSED                                     [ 45%]
+test/test_msvc.py::test_path PASSED                                     [ 47%]
+test/test_msvc.py::test_stages PASSED                                   [ 50%]
+test/test_msvc.py::test_static PASSED                                   [ 52%]
+test/test_msvc.py::test_includes PASSED                                 [ 54%]
+test/test_msvc.py::test_libpath PASSED                                  [ 57%]
+test/test_msvc.py::test_defaultlibs PASSED                              [ 59%]
+test/test_msvc.py::test_nodefaultlibs PASSED                            [ 61%]
+test/test_msvc.py::test_opts PASSED                                     [ 64%]
+test/test_msvc.py::test_safe PASSED                                     [ 66%]
+test/test_msvc.py::test_asm_output_true PASSED                          [ 69%]
+test/test_msvc.py::test_asm_output_false PASSED                         [ 71%]
+test/test_msvc.py::test_obj_output_false PASSED                         [ 73%]
+test/test_msvc.py::test_obj_output_true PASSED                          [ 76%]
+test/test_msvc.py::test_final_output PASSED                             [ 78%]
+test/test_msvc.py::test_includes_command PASSED                         [ 80%]
+test/test_msvc.py::test_libpaths_command PASSED                         [ 83%]
+test/test_msvc.py::test_defaultlibs_command PASSED                      [ 85%]
+test/test_msvc.py::test_nodefaultlibs_command PASSED                    [ 88%]
+test/test_msvc.py::test_compile PASSED                                  [ 90%]
+test/test_opifex.py::test_pytest PASSED                                 [ 92%]
+test/test_opifex.py::test_opifex PASSED                                 [ 95%]
+test/test_opifex.py::test_gnu PASSED                                    [ 97%]
+test/test_opifex.py::test_msvc PASSED                                   [100%]
 
-============================= 31 passed in 0.41s ==============================
+=================================== PASSES ===================================
+============================= 42 passed in 6.11s =============================
 ```
 ### coverage
 ```
 Name                      Stmts   Miss  Cover
 ---------------------------------------------
 src\opifex\__init__.py        2      0   100%
-src\opifex\gnu\gnu.py       167      0   100%
-src\opifex\msvc\msvc.py      78      0   100%
-test\test_gnu.py            105      0   100%
-test\test_msvc.py            42      0   100%
+src\opifex\gnu\gnu.py       184      0   100%
+src\opifex\msvc\msvc.py     138      0   100%
+test\test_gnu.py             93      0   100%
+test\test_msvc.py            94      0   100%
 test\test_opifex.py           9      0   100%
 ---------------------------------------------
-TOTAL                       403      0   100%
+TOTAL                       520      0   100%
 ```
