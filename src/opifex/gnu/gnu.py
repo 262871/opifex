@@ -131,6 +131,18 @@ class gnu:
         """
         return 'cd ' + gnu.safe(self.path.parent) + ' && '
     
+    def makedirs(self, asm, obj):
+        """
+        Set which stages to intermit at and output during compilation. 
+        kwargs: asm, obj, and final
+        """
+        os.makedirs(self.builddir, exist_ok=True)
+        if asm:
+            os.makedirs(self.builddir / self.name / 'asm', exist_ok=True)
+        if obj:
+            os.makedirs(self.builddir / self.name / 'obj', exist_ok=True)
+        return self
+    
     async def async_compile(self, files):
         """
         Run compiler concurrently, with internal configuration and files as input and return the path(s) to the output files in builddir.
