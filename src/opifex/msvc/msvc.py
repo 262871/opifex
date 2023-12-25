@@ -1,5 +1,6 @@
 import os
-import pathlib 
+import pathlib
+import subprocess
 
 class msvc:
     """
@@ -105,6 +106,15 @@ class msvc:
         """
         return ['/NODEFAULTLIB:' + nodefaultlib for nodefaultlib in self.nodefaultlibs]
     
+    def compile_kernel(self, cmd):
+        batprefix = [self.path.resolve(), '&&', 'cl']
+        task = subprocess.run(batprefix + cmd, capture_output=True, text=True)
+        return (task.returncode, task.stdout, task.stderr)
+    
+    def link_kernel(self, cmd):
+        batprefix = [self.path.resolve(), '&&', 'link']
+        task = subprocess.run(batprefix + cmd, capture_output=True, text=True)
+        return (task.returncode, task.stdout, task.stderr)
     
     def compile(self, files):
         """
