@@ -71,3 +71,11 @@ def test_asm_output_false(compiler: msvc, files):
     asms, _ = compiler.asm_output(files)
     assert not asms
 
+@pytest.fixture
+def objs():
+    return [pathlib.Path('mock/build/msvc64/main.obj'), pathlib.Path('mock/build/msvc64/app.obj')]
+
+def test_final_output(compiler: msvc, objs):
+    target, _ = compiler.final_output(objs)
+    assert msvc.safe(target) == '"C:\\Users\\User\\Desktop\\python\\opifex\\build\\opifex_msvc64"'
+

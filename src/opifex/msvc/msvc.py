@@ -75,11 +75,10 @@ class msvc:
         """
         return a component linker command that instructs the linker to name the output self.target in self.builddir
         """
-        command = []
-        final = msvc.safe(self.builddir / self.target)
-        if self.outfinal:
-            os.makedirs(self.builddir, exist_ok=True)
-            command = ['/OUT:' + final] + objs
+        final = self.builddir / self.target
+        os.makedirs(self.builddir, exist_ok=True)
+        static = ['/DEFAULTLIB:LIBCMT', '/NODEFAULTLIB:MSVCRT'] if self.static else []
+        command = ['/OUT:' + str(final) + '.exe'] + static + objs
         return final, command
     
     def includes_command(self):
