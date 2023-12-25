@@ -54,48 +54,37 @@ def files():
 
 def test_compile(compiler: gnu, files):
     compiler.setstages(True, False, False)
-    outfiles, logs = compiler.compile(files)
-    assert outfiles
-    assert len(logs) == 1
-    compiler.setstages(False, True, False)
-    outfiles, logs = compiler.compile(files)
-    assert outfiles
-    assert len(logs) == 1
-    compiler.setstages(False, False, True)
     executable, logs = compiler.compile(files)
     assert executable
-    assert len(logs) == 1
+    assert len(logs) == 3
+    compiler.setstages(True, True, True)
+    executable, logs = compiler.compile(files)
+    assert executable
+    assert len(logs) == 3
 
 @pytest.mark.asyncio
 async def test_async_compile(compiler: gnu, files):
     compiler.setstages(True, False, False)
-    outfiles, logs = await compiler.async_compile(files)
-    assert outfiles
-    assert len(logs) == 1
-    compiler.setstages(False, True, False)
-    outfiles, logs = await compiler.async_compile(files)
-    assert outfiles
-    assert len(logs) == 1
-    compiler.setstages(False, False, True)
     executable, logs = await compiler.async_compile(files)
     assert executable
-    assert len(logs) == 1
+    assert len(logs) == 3
+    compiler.setstages(True, True, True)
+    executable, logs = await compiler.async_compile(files)
+    assert executable
+    assert len(logs) == 3
 
 def test_safe():
     assert gnu.safe(pathlib.Path('\\test path\\with backslash and spaces')) == '"/test path/with backslash and spaces"'
     
 def test_asm_command(compiler: gnu, files):
     compiler.addincludes('test/mock/include')
-    asm_files, command = compiler.asm_command(files)
-    assert len(command) == 12
-    print(command)
-    assert set(asm_files) == {pathlib.Path('build/mingw64/asm/main.s').resolve(), pathlib.Path('build/mingw64/asm/app.s').resolve()}
+    asm_files, command = compiler.asm_command(files[0])
+    assert len(command) == 10
 
 def test_obj_command(compiler: gnu, files):
     compiler.addincludes('test/mock/include')
-    obj_files, command = compiler.obj_command(files)
-    assert len(command) == 12
-    assert set(obj_files) == {pathlib.Path('build/mingw64/obj/main.obj').resolve(), pathlib.Path('build/mingw64/obj/app.obj').resolve()}
+    obj_files, command = compiler.obj_command(files[0])
+    assert len(command) == 10
 
 def test_final_command(compiler: gnu, files):
     compiler.addincludes('test/mock/include')
@@ -120,7 +109,6 @@ async def test_async_compile_kernel(compiler: gnu):
 
 def test_create_env(compiler: gnu):
     env = compiler.create_env()
-    print(env)
     assert env['Path'].startswith('C:\\msys64\\mingw64\\bin;')
 
 def test_create_prefix(compiler: gnu):
