@@ -117,3 +117,15 @@ def test_compile(compiler: msvc, files):
     assert all(objs)
     assert target is not None
     assert logs[0][0] == logs[1][0] == 0
+
+@pytest.mark.asyncio
+async def test_async_compile_kernel(compiler: msvc, files):
+    compiler.name += 'a'
+    compiler.target += 'a'
+    compiler.setstages(True, True, True)
+    result = await compiler.async_compile(files)
+    asms, objs, target, logs = result
+    assert all(asms)
+    assert all(objs)
+    assert target is not None
+    assert logs[0][0] == logs[1][0] == 0
