@@ -79,7 +79,7 @@ class msvc:
         final = self.builddir / self.target
         os.makedirs(self.builddir, exist_ok=True)
         static = ['/DEFAULTLIB:LIBCMT', '/NODEFAULTLIB:MSVCRT'] if self.static else []
-        command = ['/OUT:' + str(final) + '.exe'] + static + objs
+        command = ['/OUT:' + str(final) + '.exe'] + static
         return final, command
     
     def includes_command(self):
@@ -133,7 +133,7 @@ class msvc:
             libpaths = self.libpaths_command()
             defaultlibs = self.defaultlibs_command()
             nodefaultlibs = self.nodefaultlibs_command()
-            ret, stdout, stderr = self.link_kernel(fe + libpaths + defaultlibs + nodefaultlibs)
+            ret, stdout, stderr = self.link_kernel([str(obj) for obj in objs] + fe + libpaths + defaultlibs + nodefaultlibs)
             logs += [[ret, stdout, stderr]]
         
         return (asms, objs, target, logs)
