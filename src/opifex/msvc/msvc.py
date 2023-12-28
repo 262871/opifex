@@ -1,3 +1,4 @@
+import asyncio
 import os
 import pathlib
 import subprocess
@@ -115,6 +116,40 @@ class msvc:
         batprefix = [self.path.resolve(), '&&', 'link']
         task = subprocess.run(batprefix + cmd, capture_output=True, text=True)
         return (task.returncode, task.stdout, task.stderr)
+    
+    async def async_compile_kernel(self, cmd):
+        batprefix = msvc.safe(self.path) + ' && cl '
+        task = await asyncio.create_subprocess_shell(batprefix + cmd, stderr=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE)
+        stdout, stderr = await task.communicate()
+        return (task.returncode, stdout, stderr)
+    
+    async def async_link_kernel(self, cmd):
+        batprefix = msvc.safe(self.path) + ' && link '
+        task = await asyncio.create_subprocess_shell(batprefix + cmd, stderr=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE)
+        stdout, stderr = await task.communicate()
+        return (task.returncode, stdout, stderr)
+    
+    async def async_compile(self, files):
+        """
+        Run compiler and linker with internal configuration and files as input and return the path(s) to the output files in builddir.
+        """
+        asms, fa = self.asm_output(files)
+        objs, fo = self.obj_output(files)
+        includes = self.includes_command()
+        options = [option for option in self.options]
+        cmd = fa + fo + includes + options + [str(file.as_posix()) for file in files] + ['/c']
+        ret, stdout, stderr = await self.async_compile_kernel(' '.join(cmd))
+        logs = [[ret, stdout, stderr]]
+        
+        if self.outfinal:
+            target, fe = self.final_output(objs)
+            libpaths = self.libpaths_command()
+            defaultlibs = self.defaultlibs_command()
+            nodefaultlibs = self.nodefaultlibs_command()
+            ret, stdout, stderr = await self.async_link_kernel(' '.join([msvc.safe(obj) for obj in objs] + fe + libpaths + defaultlibs + nodefaultlibs))
+            logs += [[ret, stdout, stderr]]
+        
+        return (asms, objs, target, logs)
     
     def compile(self, files):
         """
