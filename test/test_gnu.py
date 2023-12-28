@@ -54,24 +54,26 @@ def files():
 
 def test_compile(compiler: gnu, files):
     compiler.setstages(True, False, False)
-    executable, logs = compiler.compile(files)
-    assert executable
-    assert len(logs) == 3
+    asms, logs = compiler.compile(files)
+    assert asms
+    assert logs['asm'][files[0]][0] == logs['asm'][files[1]][0] == 0
     compiler.setstages(True, True, True)
     executable, logs = compiler.compile(files)
     assert executable
-    assert len(logs) == 3
+    assert logs['obj'][asms[0]][0] == logs['obj'][asms[1]][0] == logs['final'][0] == 0
 
 @pytest.mark.asyncio
 async def test_async_compile(compiler: gnu, files):
+    compiler.name += 'a'
+    compiler.target += 'a'
     compiler.setstages(True, False, False)
-    executable, logs = await compiler.async_compile(files)
-    assert executable
-    assert len(logs) == 3
+    asms, logs = await compiler.async_compile(files)
+    assert asms
+    assert logs['asm'][files[0]][0] == logs['asm'][files[1]][0] == 0
     compiler.setstages(True, True, True)
     executable, logs = await compiler.async_compile(files)
     assert executable
-    assert len(logs) == 3
+    assert logs['obj'][asms[0]][0] == logs['obj'][asms[1]][0] == logs['final'][0] == 0
 
 def test_safe():
     assert gnu.safe(pathlib.Path('\\test path\\with backslash and spaces')) == '"/test path/with backslash and spaces"'
