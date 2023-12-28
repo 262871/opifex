@@ -116,4 +116,4 @@ def test_compile(compiler: msvc, files):
     assert all(asms)
     assert all(objs)
     assert target is not None
-    assert len(logs) == 2
+    assert logs[0][0] == logs[1][0] == 0
